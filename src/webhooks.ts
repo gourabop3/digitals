@@ -42,6 +42,9 @@ export const stripeWebhookHandler =
       return res.status(400).send(`Webhook Error: No user present in metadata`);
     }
 
+    const userId = session.metadata.userId as string;
+    const orderId = session.metadata.orderId as string;
+
     if (event.type === 'checkout.session.completed') {
       const payload = await getPayloadClient();
 
@@ -49,7 +52,7 @@ export const stripeWebhookHandler =
         collection: 'users',
         where: {
           id: {
-            equals: session.metadata.userId,
+            equals: userId,
           },
         },
       });
@@ -63,7 +66,7 @@ export const stripeWebhookHandler =
         depth: 2,
         where: {
           id: {
-            equals: session.metadata.orderId,
+            equals: orderId,
           },
         },
       });
@@ -80,7 +83,7 @@ export const stripeWebhookHandler =
         },
         where: {
           id: {
-            equals: session.metadata.orderId,
+            equals: orderId,
           },
         },
       });
@@ -89,12 +92,12 @@ export const stripeWebhookHandler =
       try {
         const data = await resend.emails.send({
           from: 'DigitalHippo <hello@joshtriedcoding.com>',
-          to: [user.email],
+          to: [user.email as string],
           subject: 'Thanks for your order! This is your receipt.',
           html: ReceiptEmailHtml({
             date: new Date(),
-            email: user.email,
-            orderId: session.metadata.orderId,
+            email: user.email as string,
+            orderId: orderId,
             products: order.products as Product[],
           }),
         });

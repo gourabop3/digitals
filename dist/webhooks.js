@@ -43,7 +43,7 @@ var resend_1 = require("resend");
 var ReceiptEmail_1 = require("./components/emails/ReceiptEmail");
 var resend = new resend_1.Resend(process.env.RESEND_API_KEY);
 var stripeWebhookHandler = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var webhookRequest, body, signature, event, session, payload, users, user, orders, order, data, error_1;
+    var webhookRequest, body, signature, event, session, userId, orderId, payload, users, user, orders, order, data, error_1;
     var _a, _b;
     return __generator(this, function (_c) {
         switch (_c.label) {
@@ -63,6 +63,8 @@ var stripeWebhookHandler = function (req, res) { return __awaiter(void 0, void 0
                 if (!((_a = session === null || session === void 0 ? void 0 : session.metadata) === null || _a === void 0 ? void 0 : _a.userId) || !((_b = session === null || session === void 0 ? void 0 : session.metadata) === null || _b === void 0 ? void 0 : _b.orderId)) {
                     return [2 /*return*/, res.status(400).send("Webhook Error: No user present in metadata")];
                 }
+                userId = session.metadata.userId;
+                orderId = session.metadata.orderId;
                 if (!(event.type === 'checkout.session.completed')) return [3 /*break*/, 8];
                 return [4 /*yield*/, (0, get_payload_1.getPayloadClient)()];
             case 1:
@@ -71,7 +73,7 @@ var stripeWebhookHandler = function (req, res) { return __awaiter(void 0, void 0
                         collection: 'users',
                         where: {
                             id: {
-                                equals: session.metadata.userId,
+                                equals: userId,
                             },
                         },
                     })];
@@ -85,7 +87,7 @@ var stripeWebhookHandler = function (req, res) { return __awaiter(void 0, void 0
                         depth: 2,
                         where: {
                             id: {
-                                equals: session.metadata.orderId,
+                                equals: orderId,
                             },
                         },
                     })];
@@ -101,7 +103,7 @@ var stripeWebhookHandler = function (req, res) { return __awaiter(void 0, void 0
                         },
                         where: {
                             id: {
-                                equals: session.metadata.orderId,
+                                equals: orderId,
                             },
                         },
                     })];
@@ -117,7 +119,7 @@ var stripeWebhookHandler = function (req, res) { return __awaiter(void 0, void 0
                         html: (0, ReceiptEmail_1.ReceiptEmailHtml)({
                             date: new Date(),
                             email: user.email,
-                            orderId: session.metadata.orderId,
+                            orderId: orderId,
                             products: order.products,
                         }),
                     })];
