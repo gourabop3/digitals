@@ -41,7 +41,7 @@ var stripe_1 = require("./lib/stripe");
 var get_payload_1 = require("./get-payload");
 var resend_1 = require("resend");
 var ReceiptEmail_1 = require("./components/emails/ReceiptEmail");
-var resend = new resend_1.Resend(process.env.RESEND_API_KEY);
+var resend = new resend_1.Resend(process.env.RESEND_API_KEY || 'dummy-key');
 var stripeWebhookHandler = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var webhookRequest, body, signature, event, session, userId, orderId, payload, users, user, orders, order, data, error_1;
     var _a, _b;

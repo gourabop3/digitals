@@ -5,6 +5,7 @@ import ProductReel from '@/components/ProductReel';
 import { PRODUCT_CATEGORIES } from '@/config';
 import { getPayloadClient } from '@/get-payload';
 import { formatPrice } from '@/lib/utils';
+import { Product } from '@/payload-types';
 import { Check, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -41,11 +42,13 @@ const Page = async ({ params }: PageProps) => {
 
   if (!product) return notFound();
 
+  const typedProduct = product as Product;
+
   const label = PRODUCT_CATEGORIES.find(
-    ({ value }) => value === product.category
+    ({ value }) => value === typedProduct.category
   )?.label;
 
-  const validUrls = product?.images
+  const validUrls = typedProduct.images
     .map(({ image }) => (typeof image === 'string' ? image : image.url))
     .filter(Boolean) as string[];
 
@@ -94,20 +97,20 @@ const Page = async ({ params }: PageProps) => {
 
               <div className="mt-4">
                 <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                  {product.name}
+                  {typedProduct.name}
                 </h1>
               </div>
 
               <div className="mt-4 space-y-6">
                 <p className="text-based text-muted-foreground">
-                  {product.description}
+                  {typedProduct.description}
                 </p>
               </div>
 
               <section className="mt-4">
                 <div className="flex items-center">
                   <p className="font-medium text-gray-900">
-                    {formatPrice(product.price)}
+                    {formatPrice(typedProduct.price)}
                   </p>
 
                   <div className="ml-4 border-1 text-muted-foreground border-gray-300 pl-4">
@@ -127,7 +130,7 @@ const Page = async ({ params }: PageProps) => {
               </section>
               {/* Add To Cart Button */}
               <div className="mt-10">
-                <AddToCartButton product={product} />
+                <AddToCartButton product={typedProduct} />
               </div>
               <div className="mt-6">
                 <div className="group inline-flex text-sm text-medium">
@@ -147,9 +150,9 @@ const Page = async ({ params }: PageProps) => {
 
       <ProductReel
         href="/products"
-        query={{ category: product.category, limit: 4 }}
+        query={{ category: typedProduct.category, limit: 4 }}
         title={`Similar ${label}`}
-        subtitle={`Browse similar high-quality ${label} just like '${product.name}'`}
+        subtitle={`Browse similar high-quality ${label} just like '${typedProduct.name}'`}
       />
     </MaxWidthWrapper>
   );
